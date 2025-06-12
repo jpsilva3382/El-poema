@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorando el Mágico Mundo de los Poemas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <!-- 
+    Chosen Palette: Warm Pastels (Amber, Sand, Sky Blue, Soft Green)
+    Application Structure Plan: The SPA is designed as a single-page, vertical-scrolling journey to make learning about poems interactive for 2nd graders. It starts with a simple definition, then moves to an interactive diagram where kids can click on parts of a poem (verse, stanza, rhymes) to see explanations. This contextual learning is more effective than a static list. It's followed by a visual list of a poem's purposes. The experience culminates in an interactive "Analyze the Poem" section where users click buttons to highlight verses and rhymes, reinforcing the concepts visually. The goal is to transform passive reading into active exploration and discovery.
+    Visualization & Content Choices: 
+    - Definition ('Qué es un Poema'): Goal: Inform -> Method: Simple Text Block -> Interaction: None. A clear, direct start.
+    - Parts of a Poem ('Las Partes de un Poema'): Goal: Organize/Inform -> Method: Interactive Diagram (HTML/CSS/JS) -> Interaction: Click on poem elements (verses, stanza, rhyming words) to reveal informational tooltips. Justification: This is the core interactive element, allowing children to learn by doing and seeing concepts in a real context rather than abstractly.
+    - Purpose ('Para qué sirven'): Goal: Inform -> Method: Styled List with Unicode Icons -> Interaction: None. Justification: A visually appealing and easily scannable way to present key benefits.
+    - Example Poem Analysis ('Analicemos nuestro poema'): Goal: Analyze/Reinforce -> Method: Interactive Highlighting (JS) -> Interaction: Buttons that, when clicked, highlight the corresponding parts (verses, rhymes) on the example poem. Justification: This provides immediate visual feedback and reinforces the lesson's main concepts in a hands-on way.
+    CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fdf6e3; /* sand */
+        }
+        .card {
+            background-color: #fffbeb; /* amber-50 */
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.05);
+            border: 1px solid #fde68a; /* amber-200 */
+        }
+        .interactive-poem .verse:hover {
+            background-color: #fde68a; /* amber-200 */
+            cursor: pointer;
+            border-radius: 0.5rem;
+        }
+        .highlight-verse {
+            outline: 2px dashed #38bdf8; /* sky-400 */
+            border-radius: 0.5rem;
+        }
+        .highlight-rhyme {
+            background-color: #a7f3d0; /* emerald-200 */
+            border-radius: 0.5rem;
+            padding: 0 0.25rem;
+            transition: all 0.3s ease;
+        }
+        .tooltip {
+            position: absolute;
+            background-color: #1e293b; /* slate-800 */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            font-size: 0.875rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            transform: translateY(-10px);
+            z-index: 10;
+        }
+        .interactive-poem .verse:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .poem-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .poem-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .poem-button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+
+        <!-- Header -->
+        <header class="text-center my-8 md:my-12">
+            <h1 class="text-4xl md:text-6xl font-bold text-amber-600">¡Explorando el Mágico Mundo de los Poemas!</h1>
+            <p class="text-lg md:text-xl mt-2 text-gray-600">Una aventura interactiva para pequeños poetas</p>
+        </header>
+
+        <!-- Section 1: What is a Poem? -->
+        <section id="que-es" class="mb-12">
+            <div class="card">
+                <h2 class="text-3xl font-bold text-amber-700 mb-4">1. ¿Qué es un Poema?</h2>
+                <p class="text-lg text-gray-700 mb-4">
+                    Un **poema** es como una **canción sin música** o un **dibujo hecho solo con palabras**. ¡Las palabras en un poema juegan y bailan juntas para expresar sentimientos e ideas de una forma muy bonita!
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                    <div class="p-4 bg-white rounded-xl border border-amber-100">
+                        <span class="text-4xl">😊</span>
+                        <p class="mt-2 font-semibold">Expresar lo que sentimos</p>
+                    </div>
+                    <div class="p-4 bg-white rounded-xl border border-amber-100">
+                        <span class="text-4xl">🌸</span>
+                        <p class="mt-2 font-semibold">Describir cosas bonitas</p>
+                    </div>
+                    <div class="p-4 bg-white rounded-xl border border-amber-100">
+                        <span class="text-4xl">🚀</span>
+                        <p class="mt-2 font-semibold">Imaginar mundos fantásticos</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Parts of a Poem -->
+        <section id="partes" class="mb-12">
+            <div class="card">
+                <h2 class="text-3xl font-bold text-amber-700 mb-2">2. Las Partes de un Poema</h2>
+                 <p class="text-lg text-gray-700 mb-6">
+                    Los poemas tienen "pedacitos" especiales. ¡Haz clic en cada línea para descubrir qué es!
+                </p>
+                <div class="flex justify-center">
+                    <div class="interactive-poem text-center text-xl md:text-2xl leading-loose p-4 relative" id="interactivePoem">
+                        <div class="verse relative" data-info="¡Esto es una ESTROFA! Un grupo de versos que van juntos.">
+                            <span class="tooltip">¡Esto es una ESTROFA! Un grupo de versos que van juntos.</span>
+                            <div class="verse relative" data-info="¡Esto es un VERSO! Cada línea del poema se llama verso.">
+                                <span class="tooltip">¡Esto es un VERSO! Cada línea del poema se llama verso.</span>
+                                El sol, redondito y <span class="font-bold text-sky-600" data-info="¡Esto es una RIMA! Las palabras 'brillante' e 'instante' suenan parecido al final.">brillante</span>,
+                            </div>
+                            <div class="verse relative" data-info="¡Esto es un VERSO! Cada línea del poema se llama verso.">
+                                <span class="tooltip">¡Esto es un VERSO! Cada línea del poema se llama verso.</span>
+                                se asoma por la ventana al <span class="font-bold text-sky-600" data-info="¡Esto es una RIMA! Las palabras 'brillante' e 'instante' suenan parecido al final.">instante</span>.
+                            </div>
+                            <div class="verse relative" data-info="¡Esto es un VERSO! Cada línea del poema se llama verso.">
+                               <span class="tooltip">¡Esto es un VERSO! Cada línea del poema se llama verso.</span>
+                                Nos da su calor con un <span class="font-bold text-green-600" data-info="¡Esto es una RIMA! Las palabras 'rayo' y 'Mayo' suenan parecido al final.">rayo</span>,
+                            </div>
+                            <div class="verse relative" data-info="¡Esto es un VERSO! Cada línea del poema se llama verso.">
+                                <span class="tooltip">¡Esto es un VERSO! Cada línea del poema se llama verso.</span>
+                                ¡Alegrando todo el <span class="font-bold text-green-600" data-info="¡Esto es una RIMA! Las palabras 'rayo' y 'Mayo' suenan parecido al final.">Mayo</span>!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Purpose -->
+        <section id="para-que" class="mb-12">
+            <div class="card">
+                 <h2 class="text-3xl font-bold text-amber-700 mb-4">3. ¿Para qué sirven los Poemas?</h2>
+                 <ul class="space-y-3 text-lg">
+                    <li class="flex items-center"><span class="text-2xl mr-3">❤️</span> Contar lo que llevamos dentro (sentimientos).</li>
+                    <li class="flex items-center"><span class="text-2xl mr-3">🎨</span> Pintar con palabras lo bello del mundo.</li>
+                    <li class="flex items-center"><span class="text-2xl mr-3">📖</span> Crear momentos e historias especiales.</li>
+                    <li class="flex items-center"><span class="text-2xl mr-3">🎲</span> ¡Divertirse jugando con las palabras!</li>
+                    <li class="flex items-center"><span class="text-2xl mr-3">✨</span> Soñar e imaginar sin límites.</li>
+                 </ul>
+            </div>
+        </section>
+
+        <!-- Section 4: Analyze -->
+        <section id="analicemos" class="mb-12">
+            <div class="card text-center">
+                 <h2 class="text-3xl font-bold text-amber-700 mb-4">4. ¡Analicemos nuestro poema!</h2>
+                 <p class="text-lg text-gray-700 mb-6">
+                    Usa los botones para ver las partes del poema resaltadas.
+                </p>
+                
+                <div id="poem-display" class="text-2xl leading-loose my-6 p-4 bg-white rounded-xl border border-amber-100">
+                    <p class="poem-line">El sol, redondito y <span class="rhyme-group-1">brillante</span>,</p>
+                    <p class="poem-line">se asoma por la ventana al <span class="rhyme-group-1">instante</span>.</p>
+                    <p class="poem-line">Nos da su calor con un <span class="rhyme-group-2">rayo</span>,</p>
+                    <p class="poem-line">¡Alegrando todo el <span class="rhyme-group-2">Mayo</span>!</p>
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button id="btn-show-verses" class="poem-button bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-6 rounded-full">Mostrar Versos (4)</button>
+                    <button id="btn-show-rhymes" class="poem-button bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full">Mostrar Rimas</button>
+                    <button id="btn-reset" class="poem-button bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-full">Limpiar</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center py-8 text-gray-500">
+            
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const poemLines = document.querySelectorAll('#poem-display .poem-line');
+            const rhymes1 = document.querySelectorAll('#poem-display .rhyme-group-1');
+            const rhymes2 = document.querySelectorAll('#poem-display .rhyme-group-2');
+
+            const btnShowVerses = document.getElementById('btn-show-verses');
+            const btnShowRhymes = document.getElementById('btn-show-rhymes');
+            const btnReset = document.getElementById('btn-reset');
+
+            const interactivePoemElements = document.querySelectorAll('.interactive-poem .verse, .interactive-poem span[data-info]');
+
+            function resetHighlights() {
+                poemLines.forEach(line => line.classList.remove('highlight-verse'));
+                rhymes1.forEach(rhyme => rhyme.classList.remove('highlight-rhyme'));
+                rhymes2.forEach(rhyme => rhyme.classList.remove('highlight-rhyme'));
+            }
+
+            btnShowVerses.addEventListener('click', () => {
+                resetHighlights();
+                poemLines.forEach(line => line.classList.add('highlight-verse'));
+            });
+
+            btnShowRhymes.addEventListener('click', () => {
+                resetHighlights();
+                rhymes1.forEach(rhyme => rhyme.classList.add('highlight-rhyme'));
+                rhymes2.forEach(rhyme => rhyme.classList.add('highlight-rhyme'));
+            });
+
+            btnReset.addEventListener('click', resetHighlights);
+
+            // Interactive tooltip logic
+            interactivePoemElements.forEach(el => {
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    
+                    const tooltip = el.querySelector('.tooltip');
+                    if (!tooltip) return;
+
+                    // Hide all other tooltips
+                    document.querySelectorAll('.tooltip').forEach(t => {
+                        if (t !== tooltip) {
+                           t.style.opacity = '0';
+                           t.style.visibility = 'hidden';
+                        }
+                    });
+
+                    // Toggle current tooltip
+                    if (tooltip.style.opacity === '1') {
+                        tooltip.style.opacity = '0';
+                        tooltip.style.visibility = 'hidden';
+                    } else {
+                        tooltip.style.opacity = '1';
+                        tooltip.style.visibility = 'visible';
+                    }
+                });
+            });
+
+             // Hide tooltips when clicking outside
+            document.addEventListener('click', (e) => {
+                 if (!e.target.closest('.interactive-poem')) {
+                     document.querySelectorAll('.tooltip').forEach(t => {
+                        t.style.opacity = '0';
+                        t.style.visibility = 'hidden';
+                    });
+                 }
+            });
+
+        });
+    </script>
+
+</body>
+</html>
